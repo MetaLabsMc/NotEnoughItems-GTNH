@@ -36,6 +36,7 @@ public class PositionedStack {
 
     public void generatePermutations() {
         if (permutated) return;
+        if (items == null) return;
 
         ArrayList<ItemStack> stacks = new ArrayList<>();
         for (ItemStack item : items) {

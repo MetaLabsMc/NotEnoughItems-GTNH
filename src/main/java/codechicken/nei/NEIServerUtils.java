@@ -373,6 +373,7 @@ public class NEIServerUtils {
         if (obj instanceof ItemStack) return new ItemStack[] { (ItemStack) obj };
         if (obj instanceof ItemStack[]) return (ItemStack[]) obj;
         if (obj instanceof List) return ((List<ItemStack>) obj).toArray(new ItemStack[0]);
+        if (obj == null) return null;
 
         throw new ClassCastException(obj + " not an ItemStack, ItemStack[] or List<ItemStack?");
     }
