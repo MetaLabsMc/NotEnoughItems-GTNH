@@ -666,6 +666,9 @@ public abstract class GuiRecipe<H extends IRecipeHandler> extends GuiContainer i
         final int recipesPerPage = getRecipesPerPage();
         final int ySkip = limitToOneRecipe ? 25 : 0;
         if (!limitToOneRecipe) {
+            if (handler == null || handler.getRecipeName() == null) {
+                return;
+            }
             String s = handler.getRecipeName().trim();
             fontRendererObj.drawStringWithShadow(s, (xSize - fontRendererObj.getStringWidth(s)) / 2, 5, 0xffffff);
             s = NEIClientUtils.translate("recipe.page", page + 1, (handler.numRecipes() - 1) / recipesPerPage + 1);
