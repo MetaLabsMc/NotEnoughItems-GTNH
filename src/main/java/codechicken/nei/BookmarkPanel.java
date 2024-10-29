@@ -504,7 +504,7 @@ public class BookmarkPanel extends PanelWidget {
             final ItemStack normalizedA = StackInfo.loadFromNBT(nbTagA);
             BookmarkRecipeId recipeId = null;
 
-            if (handlerName != "" && ingredients != null) {
+            if (!handlerName.isEmpty() && ingredients != null) {
                 recipeId = new BookmarkRecipeId(handlerName, ingredients);
             }
 
@@ -514,13 +514,19 @@ public class BookmarkPanel extends PanelWidget {
                 BGrid.removeRecipe(idx, saveIngredients);
             } else {
 
-                if (saveIngredients && handlerName != "" && ingredients != null) {
+                if (saveIngredients && !handlerName.isEmpty() && ingredients != null) {
                     final Map<NBTTagCompound, Integer> unique = new HashMap<>();
                     final ArrayList<NBTTagCompound> sorted = new ArrayList<>();
 
                     BGrid.removeRecipe(recipeId);
 
                     for (PositionedStack stack : ingredients) {
+                        if (stack.item != null) {
+                            if (stack.item.hasTagCompound() && stack.item.getTagCompound().hasKey("Aspects")) {
+                                continue;
+                            }
+                        }
+
                         final NBTTagCompound nbTag = StackInfo.itemStackToNBT(stack.item, saveStackSize);
 
                         if (unique.get(nbTag) == null) {
