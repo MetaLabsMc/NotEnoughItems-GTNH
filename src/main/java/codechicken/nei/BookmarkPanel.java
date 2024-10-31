@@ -338,7 +338,7 @@ public class BookmarkPanel extends PanelWidget {
                 BookmarkStackMeta meta = getMetadata(idx);
                 if (isPartOfFocusedRecipe(focus, idx)) {
                     drawRect(rect.x, rect.y, rect.w, rect.h, meta.ingredient ? 0x88b3b300 : 0x88009933); // highlight
-                                                                                                         // recipe
+                    // recipe
                 } else if (focus.slotIndex == idx) {
                     drawRect(rect.x, rect.y, rect.w, rect.h, 0xee555555); // highlight
                 }
@@ -503,30 +503,38 @@ public class BookmarkPanel extends PanelWidget {
             final NBTTagCompound nbTagA = StackInfo.itemStackToNBT(stackover, saveStackSize);
             final ItemStack normalizedA = StackInfo.loadFromNBT(nbTagA);
             BookmarkRecipeId recipeId = null;
+            List<PositionedStack> normalizedIngredients = new ArrayList<>();
 
-            if (!handlerName.isEmpty() && ingredients != null) {
-                recipeId = new BookmarkRecipeId(handlerName, ingredients);
+            if (ingredients != null) {
+                for (PositionedStack stack : ingredients) {
+                    if (stack.item != null) {
+                        if (stack.item.hasTagCompound() && stack.item.getTagCompound().hasKey("Aspects")) {
+                            continue;
+                        }
+
+                        normalizedIngredients.add(stack);
+                    }
+                }
             }
+
+            try {
+                if (!handlerName.isEmpty() && !normalizedIngredients.isEmpty()) {
+                    recipeId = new BookmarkRecipeId(handlerName, normalizedIngredients);
+                }
+            } catch (Throwable ignored) {}
 
             final int idx = BGrid.indexOf(normalizedA, recipeId);
 
             if (idx != -1) {
                 BGrid.removeRecipe(idx, saveIngredients);
             } else {
-
-                if (saveIngredients && !handlerName.isEmpty() && ingredients != null) {
+                if (saveIngredients && !handlerName.isEmpty() && !normalizedIngredients.isEmpty()) {
                     final Map<NBTTagCompound, Integer> unique = new HashMap<>();
                     final ArrayList<NBTTagCompound> sorted = new ArrayList<>();
 
                     BGrid.removeRecipe(recipeId);
 
-                    for (PositionedStack stack : ingredients) {
-                        if (stack.item != null) {
-                            if (stack.item.hasTagCompound() && stack.item.getTagCompound().hasKey("Aspects")) {
-                                continue;
-                            }
-                        }
-
+                    for (PositionedStack stack : normalizedIngredients) {
                         final NBTTagCompound nbTag = StackInfo.itemStackToNBT(stack.item, saveStackSize);
 
                         if (unique.get(nbTag) == null) {
